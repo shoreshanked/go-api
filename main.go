@@ -5,8 +5,6 @@ import (
 	api_controller "go-api/pkg/apis"
 	time_controller "go-api/pkg/datetime"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 type EndpointInfo struct {
@@ -22,10 +20,10 @@ type ApiDetails struct {
 
 func initApiDetails() ApiDetails {
 
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	fmt.Println("Error loading .env file")
+	// }
 
 	apiKey := os.Getenv("API_KEY")
 	baseUri := os.Getenv("BASE_URI")
@@ -53,6 +51,7 @@ func main() {
 
 	apiDetails := initApiDetails()
 	from, to := time_controller.GetTimeRange()
+	fmt.Printf("From: %s\nTo: %s\n", from, to)
 
 	for idx, endpoint := range apiDetails.Endpoints {
 
