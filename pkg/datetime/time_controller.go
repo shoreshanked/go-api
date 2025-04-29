@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GetMidnightRange() (string, string) {
+func GetTimeRange() (string, string) {
 	// Define the GMT+1 timezone (British Summer Time)
 	loc, err := time.LoadLocation("Europe/London") // Use this location to ensure correct timezone handling
 	if err != nil {

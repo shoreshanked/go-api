@@ -52,7 +52,7 @@ func initApiDetails() ApiDetails {
 func main() {
 
 	apiDetails := initApiDetails()
-	from, to := time_controller.GetMidnightRange()
+	from, to := time_controller.GetTimeRange()
 
 	for idx, endpoint := range apiDetails.Endpoints {
 
