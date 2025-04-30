@@ -11,8 +11,10 @@ import (
 // type of retryablefunction = a type that is a function and all it does is return an error
 type RetryableFunc func() error
 
-const defaultMaxRetries = 2
-const defaultBaseDelay = 2 * time.Second
+const (
+	defaultMaxRetries = 2
+	defaultBaseDelay  = 2 * time.Second
+)
 
 type ConsumptionResult struct {
 	Consumption   float64 `json:"consumption"`
@@ -28,12 +30,10 @@ type ApiResponse struct {
 }
 
 func GetData(apiKey string, endpoint string, to string, from string) ([]byte, error) {
-
 	var resultBody []byte
 
 	// retryableFunc is equal to a function that returns an error
 	retryableFunc := func() error {
-
 		req, err := http.NewRequest("GET", endpoint, nil)
 		if err != nil {
 			return err
