@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 // type of retryablefunction = a type that is a function and all it does is return an error
@@ -15,6 +17,16 @@ const (
 	defaultMaxRetries = 2
 	defaultBaseDelay  = 2 * time.Second
 )
+
+type APIService struct {
+	log zerolog.Logger
+}
+
+var apiService *APIService
+
+func InitAPIService(log zerolog.Logger) {
+	apiService = &APIService{log: log}
+}
 
 type ConsumptionResult struct {
 	Consumption   float64 `json:"consumption"`
@@ -66,7 +78,9 @@ func GetData(apiKey string, endpoint string, to string, from string) ([]byte, er
 			return err
 		}
 
-		fmt.Println("Data received successfully")
+		apiService.log.Info().
+			Msg("Data recieved succesfully")
+
 		resultBody = body
 		return nil
 	}
@@ -83,7 +97,6 @@ func ParseApiResponse(resultBody []byte) (string, float64) {
 	response := unmarshalApiResponse(resultBody)
 	totalConsumption := sumConsumption(response)
 	prettyJSON := marshalIndentResponse(response)
-
 	return string(prettyJSON), totalConsumption
 }
 
@@ -91,7 +104,7 @@ func unmarshalApiResponse(resultBody []byte) []ConsumptionResult {
 	var response ApiResponse
 	err := json.Unmarshal(resultBody, &response)
 	if err != nil {
-		fmt.Printf("Failed to unmarshal JSON: %v", err)
+		apiService.log.Error().Err(err).Msg("Failed to unmarshal JSON")
 	}
 	return response.Results
 }
@@ -120,7 +133,9 @@ func doWithRetries(fn RetryableFunc, max_retries int, base_delay time.Duration) 
 			return nil
 		}
 		delay := base_delay * (1 << i)
-		fmt.Printf("Retrying in %v...\n", delay)
+		apiService.log.Info().
+			Str("retrying_in", delay.String()).
+			Msg("Retrying...")
 		time.Sleep(delay)
 	}
 	return last_err

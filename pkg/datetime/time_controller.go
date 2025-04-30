@@ -1,15 +1,28 @@
 package time_controller
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
+type TimeService struct {
+	log zerolog.Logger
+}
+
+var timeService *TimeService
+
+func InitTimeService(log zerolog.Logger) {
+	timeService = &TimeService{log: log}
+}
+
 func GetTimeRange() (string, string) {
+
+	timeService.log.Info().Msg("Calculating timeframe for data retrieval")
 	// Define the GMT+1 timezone (British Summer Time)
 	loc, err := time.LoadLocation("Europe/London") // Use this location to ensure correct timezone handling
 	if err != nil {
-		fmt.Println("Error loading timezone:", err)
+		timeService.log.Error().Err(err).Msg("Error Loading Timezone")
 		return "", ""
 	}
 
