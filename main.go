@@ -53,7 +53,6 @@ func initApiDetails(log zerolog.Logger) ApiDetails {
 }
 
 func main() {
-
 	log := log_controller.SetupLogger()
 	api_controller.InitAPIService(log)
 	time_controller.InitTimeService(log)

@@ -17,7 +17,6 @@ func InitTimeService(log zerolog.Logger) {
 }
 
 func GetTimeRange() (string, string) {
-
 	timeService.log.Info().Msg("Calculating timeframe for data retrieval")
 	// Define the GMT+1 timezone (British Summer Time)
 	loc, err := time.LoadLocation("Europe/London") // Use this location to ensure correct timezone handling
