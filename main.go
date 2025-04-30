@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	api_controller "go-api/pkg/apis"
 	time_controller "go-api/pkg/datetime"
-	"os"
 )
 
 type EndpointInfo struct {
@@ -19,7 +20,6 @@ type ApiDetails struct {
 }
 
 func initApiDetails() ApiDetails {
-
 	// err := godotenv.Load()
 	// if err != nil {
 	// 	fmt.Println("Error loading .env file")
@@ -48,7 +48,6 @@ func initApiDetails() ApiDetails {
 }
 
 func main() {
-
 	apiDetails := initApiDetails()
 	from, to := time_controller.GetTimeRange()
 	fmt.Printf("From: %s\nTo: %s\n", from, to)
@@ -57,7 +56,6 @@ func main() {
 
 		fmt.Printf("%v\t%v\n", idx, endpoint)
 		resp, err := api_controller.GetData(apiDetails.ApiKey, endpoint.Url, to, from)
-
 		if err != nil {
 			// Print the error or log it; for now, let's print it
 			fmt.Println("Error:", err)
@@ -69,5 +67,4 @@ func main() {
 		fmt.Println(formattedJson)
 		fmt.Printf("Total %s consumption: %.3f kWh\n", endpoint.Type, totalConsumption)
 	}
-
 }

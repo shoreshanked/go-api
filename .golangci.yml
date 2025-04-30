@@ -1,0 +1,12 @@
+linters:
+  enable:
+    - gofumpt
+    - govet
+    - staticcheck
+    - errcheck
+
+run:
+  timeout: 5m
+
+issues:
+  exclude-use-default: false
