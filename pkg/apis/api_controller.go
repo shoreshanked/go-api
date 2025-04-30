@@ -1,7 +1,6 @@
 package api_controller
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,14 +47,7 @@ func GetData(apiKey string, endpoint string, to string, from string) ([]byte, er
 		req.URL.RawQuery = q.Encode()
 
 		req.SetBasicAuth(apiKey, "")
-
-		client := &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true, // Disable certificate verification
-				},
-			},
-		}
+		client := &http.Client{}
 
 		resp, err := client.Do(req)
 		if err != nil {
