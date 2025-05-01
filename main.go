@@ -4,14 +4,18 @@ import (
 	"fmt"
 
 	api_controller "go-api/pkg/apis"
+	core_controller "go-api/pkg/core"
 	time_controller "go-api/pkg/datetime"
 	log_controller "go-api/pkg/logging"
 )
 
 func main() {
+	// Setup Logging
+	logService := log_controller.NewLogService("info")
+	log := logService.Logger()
 	// Setup Services
-	log := log_controller.SetupLogger()
-	apiService := api_controller.NewAPIService(log)
+	coreService := core_controller.NewCoreService(log)
+	apiService := api_controller.NewAPIService(log, coreService.EnvironmentVariables())
 	timeService := time_controller.NewTimeService(log)
 
 	// Retrieve method parameters
@@ -22,9 +26,10 @@ func main() {
 		Str("To", to).
 		Msg("Time range")
 
+	// Get Data for each specified endpoint
 	for idx, endpoint := range apiService.Endpoints() {
 
-		log.Info().
+		log.Debug().
 			Int("Index:", idx).
 			Str("Name", endpoint.Type).
 			Str("URL", endpoint.Url).Msg("Logging endpoint")
@@ -38,7 +43,7 @@ func main() {
 
 		formattedJson, totalConsumption := apiService.ParseApiResponse(resp)
 
-		log.Info().
+		log.Debug().
 			Msgf("Response data:\n%s", formattedJson)
 
 		log.Info().

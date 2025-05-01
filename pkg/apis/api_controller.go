@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -53,18 +52,13 @@ func (s *APIService) Endpoints() []EndpointInfo {
 	return s.apiDetails.Endpoints
 }
 
-func NewAPIService(log zerolog.Logger) *APIService {
+func NewAPIService(log zerolog.Logger, envVars map[string]string) *APIService {
 	log.Info().Msg("Initialising API details from Env vars")
 
-	apiKey := os.Getenv("API_KEY")
-	baseUri := os.Getenv("BASE_URI")
-	elecMPAN := os.Getenv("ELEC_MPAN")
-	elecSerial := os.Getenv("ELEC_SERIAL")
-	gasMPRN := os.Getenv("GAS_MPRN")
-	gasSerial := os.Getenv("GAS_SERIAL")
-
-	elecEndpoint := fmt.Sprintf("%selectricity-meter-points/%s/meters/%s/consumption/", baseUri, elecMPAN, elecSerial)
-	gasEndpoint := fmt.Sprintf("%sgas-meter-points/%s/meters/%s/consumptionn/", baseUri, gasMPRN, gasSerial)
+	elecEndpoint := fmt.Sprintf("%selectricity-meter-points/%s/meters/%s/consumption/",
+		envVars["BASE_URI"], envVars["ELEC_MPAN"], envVars["ELEC_SERIAL"])
+	gasEndpoint := fmt.Sprintf("%sgas-meter-points/%s/meters/%s/consumptionn/",
+		envVars["BASE_URI"], envVars["GAS_MPRN"], envVars["GAS_SERIAL"])
 
 	endpoints := []EndpointInfo{
 		{Type: "electric", Url: elecEndpoint},
@@ -72,8 +66,8 @@ func NewAPIService(log zerolog.Logger) *APIService {
 	}
 
 	apiDetails := ApiDetails{
-		ApiKey:    apiKey,
-		BaseUri:   baseUri,
+		ApiKey:    envVars["API_KEY"],
+		BaseUri:   envVars["BASE_URI"],
 		Endpoints: endpoints,
 	}
 
