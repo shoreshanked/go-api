@@ -15,7 +15,6 @@ func main() {
 	timeService := time_controller.NewTimeService(log)
 
 	// Retrieve method parameters
-	apiDetails := apiService.InitApiDetails()
 	from, to := timeService.GetTimeRange()
 
 	log.Info().
@@ -23,14 +22,14 @@ func main() {
 		Str("To", to).
 		Msg("Time range")
 
-	for idx, endpoint := range apiDetails.Endpoints {
+	for idx, endpoint := range apiService.Endpoints() {
 
 		log.Info().
 			Int("Index:", idx).
 			Str("Name", endpoint.Type).
 			Str("URL", endpoint.Url).Msg("Logging endpoint")
 
-		resp, err := apiService.GetData(apiDetails.ApiKey, endpoint.Url, to, from)
+		resp, err := apiService.GetData(endpoint.Url, to, from)
 		if err != nil {
 			// Print the error or log it; for now, let's print it
 			log.Error().Err(err).Msg("")

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 // type of retryablefunction = a type that is a function and all it does is return an error
@@ -21,11 +20,8 @@ const (
 )
 
 type APIService struct {
-	log zerolog.Logger
-}
-
-func NewAPIService(log zerolog.Logger) *APIService {
-	return &APIService{log: log}
+	log        zerolog.Logger
+	apiDetails ApiDetails
 }
 
 type EndpointInfo struct {
@@ -52,12 +48,12 @@ type ApiResponse struct {
 	Results  []ConsumptionResult `json:"results"`
 }
 
-func (s *APIService) InitApiDetails() ApiDetails {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	fmt.Println("Error loading .env file")
-	// }
+// Getter for main to access to the Endpoints
+func (s *APIService) Endpoints() []EndpointInfo {
+	return s.apiDetails.Endpoints
+}
 
+func NewAPIService(log zerolog.Logger) *APIService {
 	log.Info().Msg("Initialising API details from Env vars")
 
 	apiKey := os.Getenv("API_KEY")
@@ -75,16 +71,19 @@ func (s *APIService) InitApiDetails() ApiDetails {
 		{Type: "gas", Url: gasEndpoint},
 	}
 
-	api := ApiDetails{
+	apiDetails := ApiDetails{
 		ApiKey:    apiKey,
 		BaseUri:   baseUri,
 		Endpoints: endpoints,
 	}
 
-	return api
+	return &APIService{
+		log:        log,
+		apiDetails: apiDetails,
+	}
 }
 
-func (s *APIService) GetData(apiKey string, endpoint string, to string, from string) ([]byte, error) {
+func (s *APIService) GetData(endpoint string, to string, from string) ([]byte, error) {
 	var resultBody []byte
 
 	// retryableFunc is equal to a function that returns an error
@@ -101,7 +100,7 @@ func (s *APIService) GetData(apiKey string, endpoint string, to string, from str
 		}
 		req.URL.RawQuery = q.Encode()
 
-		req.SetBasicAuth(apiKey, "")
+		req.SetBasicAuth(s.apiDetails.ApiKey, "")
 		client := &http.Client{}
 
 		resp, err := client.Do(req)
