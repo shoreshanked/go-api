@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // type of retryablefunction = a type that is a function and all it does is return an error
@@ -22,10 +24,19 @@ type APIService struct {
 	log zerolog.Logger
 }
 
-var apiService *APIService
+func NewAPIService(log zerolog.Logger) *APIService {
+	return &APIService{log: log}
+}
 
-func InitAPIService(log zerolog.Logger) {
-	apiService = &APIService{log: log}
+type EndpointInfo struct {
+	Type string
+	Url  string
+}
+
+type ApiDetails struct {
+	ApiKey    string
+	BaseUri   string
+	Endpoints []EndpointInfo
 }
 
 type ConsumptionResult struct {
@@ -41,7 +52,39 @@ type ApiResponse struct {
 	Results  []ConsumptionResult `json:"results"`
 }
 
-func GetData(apiKey string, endpoint string, to string, from string) ([]byte, error) {
+func (s *APIService) InitApiDetails() ApiDetails {
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	fmt.Println("Error loading .env file")
+	// }
+
+	log.Info().Msg("Initialising API details from Env vars")
+
+	apiKey := os.Getenv("API_KEY")
+	baseUri := os.Getenv("BASE_URI")
+	elecMPAN := os.Getenv("ELEC_MPAN")
+	elecSerial := os.Getenv("ELEC_SERIAL")
+	gasMPRN := os.Getenv("GAS_MPRN")
+	gasSerial := os.Getenv("GAS_SERIAL")
+
+	elecEndpoint := fmt.Sprintf("%selectricity-meter-points/%s/meters/%s/consumption/", baseUri, elecMPAN, elecSerial)
+	gasEndpoint := fmt.Sprintf("%sgas-meter-points/%s/meters/%s/consumptionn/", baseUri, gasMPRN, gasSerial)
+
+	endpoints := []EndpointInfo{
+		{Type: "electric", Url: elecEndpoint},
+		{Type: "gas", Url: gasEndpoint},
+	}
+
+	api := ApiDetails{
+		ApiKey:    apiKey,
+		BaseUri:   baseUri,
+		Endpoints: endpoints,
+	}
+
+	return api
+}
+
+func (s *APIService) GetData(apiKey string, endpoint string, to string, from string) ([]byte, error) {
 	var resultBody []byte
 
 	// retryableFunc is equal to a function that returns an error
@@ -78,14 +121,14 @@ func GetData(apiKey string, endpoint string, to string, from string) ([]byte, er
 			return err
 		}
 
-		apiService.log.Info().
+		s.log.Info().
 			Msg("Data recieved succesfully")
 
 		resultBody = body
 		return nil
 	}
 
-	err := doWithRetries(retryableFunc, defaultMaxRetries, defaultBaseDelay) // Passing 0 uses default values
+	err := s.doWithRetries(retryableFunc, defaultMaxRetries, defaultBaseDelay) // Passing 0 uses default values
 	if err != nil {
 		return nil, err // If retries failed, return the error
 	}
@@ -93,23 +136,23 @@ func GetData(apiKey string, endpoint string, to string, from string) ([]byte, er
 	return resultBody, nil
 }
 
-func ParseApiResponse(resultBody []byte) (string, float64) {
-	response := unmarshalApiResponse(resultBody)
-	totalConsumption := sumConsumption(response)
-	prettyJSON := marshalIndentResponse(response)
+func (s *APIService) ParseApiResponse(resultBody []byte) (string, float64) {
+	response := s.unmarshalApiResponse(resultBody)
+	totalConsumption := s.sumConsumption(response)
+	prettyJSON := s.marshalIndentResponse(response)
 	return string(prettyJSON), totalConsumption
 }
 
-func unmarshalApiResponse(resultBody []byte) []ConsumptionResult {
+func (s *APIService) unmarshalApiResponse(resultBody []byte) []ConsumptionResult {
 	var response ApiResponse
 	err := json.Unmarshal(resultBody, &response)
 	if err != nil {
-		apiService.log.Error().Err(err).Msg("Failed to unmarshal JSON")
+		s.log.Error().Err(err).Msg("Failed to unmarshal JSON")
 	}
 	return response.Results
 }
 
-func sumConsumption(entries []ConsumptionResult) float64 {
+func (s *APIService) sumConsumption(entries []ConsumptionResult) float64 {
 	var total float64
 	for _, entry := range entries {
 		total += entry.Consumption
@@ -117,7 +160,7 @@ func sumConsumption(entries []ConsumptionResult) float64 {
 	return total
 }
 
-func marshalIndentResponse(entries []ConsumptionResult) string {
+func (s *APIService) marshalIndentResponse(entries []ConsumptionResult) string {
 	prettyJSON, err := json.MarshalIndent(entries, "", "  ")
 	if err != nil {
 		return fmt.Sprintf("Failed to format JSON: %v", err)
@@ -125,7 +168,7 @@ func marshalIndentResponse(entries []ConsumptionResult) string {
 	return string(prettyJSON)
 }
 
-func doWithRetries(fn RetryableFunc, max_retries int, base_delay time.Duration) error {
+func (s *APIService) doWithRetries(fn RetryableFunc, max_retries int, base_delay time.Duration) error {
 	var last_err error
 	for i := 0; i < max_retries; i++ {
 		last_err = fn()
@@ -133,7 +176,7 @@ func doWithRetries(fn RetryableFunc, max_retries int, base_delay time.Duration) 
 			return nil
 		}
 		delay := base_delay * (1 << i)
-		apiService.log.Info().
+		s.log.Info().
 			Str("retrying_in", delay.String()).
 			Msg("Retrying...")
 		time.Sleep(delay)
