@@ -12,7 +12,6 @@ type CoreService struct {
 }
 
 func NewCoreService(log zerolog.Logger) *CoreService {
-
 	// err := godotenv.Load()
 	// if err != nil {
 	// 	log.Info().Msg("Error loading .env file")
