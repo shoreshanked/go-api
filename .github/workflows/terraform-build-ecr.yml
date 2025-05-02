@@ -1,10 +1,10 @@
 name: Deploy ECR Repository
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_run:
+    workflows: ["Lint"]
+    types:
+      - completed
 
 jobs:
   deploy-ecr:
@@ -27,13 +27,17 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Initialize Terraform
+      working-directory: infra
       run: terraform init
 
     - name: Validate Terraform
+      working-directory: infra
       run: terraform validate
 
     - name: Plan Terraform changes
+      working-directory: infra
       run: terraform plan -out=tfplan
 
     - name: Apply Terraform changes
+      working-directory: infra
       run: terraform apply -auto-approve tfplan
