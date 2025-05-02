@@ -44,17 +44,17 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Initialize Terraform
-      working-directory: infra/core
+      working-directory: infra/lightsail
       run: terraform init
 
     - name: Validate Terraform
-      working-directory: infra/core
+      working-directory: infra/lightsail
       run: terraform validate
 
     - name: Plan Terraform changes
-      working-directory: infra/core
+      working-directory: infra/lightsail
       run: terraform plan -out=tfplan
 
     - name: Apply Terraform changes
-      working-directory: infra/core
+      working-directory: infra/lightsail
       run: terraform apply -auto-approve tfplan
