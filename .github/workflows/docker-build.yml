@@ -33,8 +33,8 @@ jobs:
 
       - name: Create ECR repository if it doesn't exist
         run: |
-          aws ecr describe-repositories --repository-name go-api --region ${{ secrets.AWS_REGION }} || \
-          aws ecr create-repository --repository-name go-api --region ${{ secrets.AWS_REGION }}
+          aws ecr describe-repositories --repository-name go-api --region $AWS_REGION || \
+          aws ecr create-repository --repository-name go-api --region $AWS_REGION
 
       - name: Build Docker image
         run: |
