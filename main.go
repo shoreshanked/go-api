@@ -1,13 +1,56 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"time"
 
 	api_controller "go-api/pkg/apis"
 	core_controller "go-api/pkg/core"
 	time_controller "go-api/pkg/datetime"
 	log_controller "go-api/pkg/logging"
+
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 )
+
+func sendToInfluxDB(envVars map[string]string) {
+
+	influxURL := envVars["INFLUX_URL"]
+	influxToken := envVars["INFLUX_TOKEN"]
+	influxOrg := envVars["INFLUX_ORG"]
+	influxBucket := envVars["INFLUX_BUCKET"]
+
+	// 1) create client
+	client := influxdb2.NewClient(influxURL, influxToken)
+	// ensure resources are cleaned up
+	defer client.Close()
+
+	// 2) get blocking write client
+	writeAPI := client.WriteAPIBlocking(influxOrg, influxBucket)
+
+	// 3) prepare your data point
+	tags := map[string]string{
+		"sensor": "electric-meter",
+	}
+	fields := map[string]interface{}{
+		"consumption": 123.45,
+	}
+	// Use time.Now() here, not influxdb2.Now()
+	p := influxdb2.NewPoint(
+		"consumption", // measurement
+		tags,
+		fields,
+		time.Now(), // ← standard lib
+	)
+
+	// 4) write the point
+	ctx := context.Background()
+	if err := writeAPI.WritePoint(ctx, p); err != nil {
+		log.Fatalf("failed to write point: %v", err)
+	}
+	fmt.Println("Data sent successfully!")
+}
 
 func main() {
 	// Setup Logging
@@ -51,4 +94,7 @@ func main() {
 			Str("Total consumption", fmt.Sprintf("%.2f kwh", totalConsumption)).
 			Msg("Consumption data logged")
 	}
+
+	// Call the sendToInfluxDB function
+	sendToInfluxDB(coreService.EnvironmentVariables())
 }

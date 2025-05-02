@@ -1,10 +1,27 @@
-name: Deploy ECR Repository
+name: Deploy Containers
 
 on:
   workflow_run:
-    workflows: ["Lint"]
+    workflows: ["Build & Push Docker image to ECR"]
     types:
       - completed
+env:
+  # influxDB vars
+  TF_VAR_influx_url: ${{ secrets.INFLUX_URL }}
+  TF_VAR_influx_token: ${{ secrets.INFLUX_TOKEN }}
+  TF_VAR_influx_org: ${{ secrets.INFLUX_ORG }}
+  TF_VAR_influx_bucket: ${{ secrets.INFLUX_BUCKET }}
+
+  TF_VAR_influx_admin_user: ${{ secrets.DOCKER_INFLUXDB_INIT_USERNAME }}
+  TF_VAR_influx_admin_pass: ${{ secrets.DOCKER_INFLUXDB_INIT_PASSWORD }}
+
+  # octopus energy vars
+  TF_VAR_octopus_api_key: ${{ secrets.API_KEY }}
+  TF_VAR_octopus_base_uri: ${{ secrets.BASE_URI }}
+  TF_VAR_octopus_elec_mpan: ${{ secrets.ELEC_MPAN }}
+  TF_VAR_octopus_elec_serial: ${{ secrets.ELEC_SERIAL }}
+  TF_VAR_octopus_gas_mprn: ${{ secrets.GAS_MPRN }}
+  TF_VAR_octopus_gas_serial: ${{ secrets.GAS_SERIAL }}
 
 jobs:
   deploy-ecr:
