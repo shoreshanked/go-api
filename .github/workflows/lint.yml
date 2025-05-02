@@ -31,4 +31,5 @@ jobs:
           args: --timeout 5m
 
       - name: Run golangci-lint
+        working-directory: app
         run: golangci-lint run
