@@ -15,7 +15,6 @@ import (
 )
 
 func sendToInfluxDB(envVars map[string]string) {
-
 	influxURL := envVars["INFLUX_URL"]
 	influxToken := envVars["INFLUX_TOKEN"]
 	influxOrg := envVars["INFLUX_ORG"]
