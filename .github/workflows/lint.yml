@@ -3,21 +3,10 @@ name: Lint
 on:
   push:
     branches: [ main ]
-    paths:
-      - '**/*.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'Dockerfile'
-      - 'pkg/**'
+
   pull_request:
     branches: [ main ]
-    paths:
-      - '**/*.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'Dockerfile'
-      - 'pkg/**'
-    
+
 jobs:
   lint:
     name: Run golangci-lint (with gofumpt)
