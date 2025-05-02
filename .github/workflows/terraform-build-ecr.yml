@@ -2,8 +2,9 @@ name: Deploy ECR Repository
 
 on:
   push:
-    paths:
-      - infra/**
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   deploy-ecr:
