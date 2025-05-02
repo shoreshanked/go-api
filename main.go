@@ -6,10 +6,10 @@ import (
 	"log"
 	"time"
 
-	api_controller "go-api/app/pkg/apis"
-	core_controller "go-api/app/pkg/core"
-	time_controller "go-api/app/pkg/datetime"
-	log_controller "go-api/app/pkg/logging"
+	api_controller "go-api/pkg/apis"
+	core_controller "go-api/pkg/core"
+	time_controller "go-api/pkg/datetime"
+	log_controller "go-api/pkg/logging"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 )

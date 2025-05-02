@@ -2,14 +2,10 @@ name: Lint
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'app/**'
+    branches: [main]
   pull_request:
-    branches: [ main ]
-    paths:
-      - 'app/**'
-
+    branches: [main]
+    
 jobs:
   lint:
     name: Run golangci-lint (with gofumpt)
@@ -31,5 +27,4 @@ jobs:
           args: --timeout 5m
 
       - name: Run golangci-lint
-        working-directory: app
         run: golangci-lint run
