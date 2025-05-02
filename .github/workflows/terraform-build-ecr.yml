@@ -1,11 +1,9 @@
 name: Deploy ECR Repository
 
 on:
-  workflow_run:
-    paths: infra/**
-    workflows: ["Lint"]
-    types:
-      - completed
+  push:
+    paths:
+      - infra/**
 
 jobs:
   deploy-ecr:
