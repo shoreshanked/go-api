@@ -2,9 +2,21 @@ name: Lint
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Dockerfile'
+      - 'pkg/**'
   pull_request:
-    branches: [main]
+    branches: [ main ]
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Dockerfile'
+      - 'pkg/**'
     
 jobs:
   lint:
