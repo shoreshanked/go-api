@@ -71,3 +71,8 @@ variable "octopus_gas_serial" {
   type      = string
   default   = null
 }
+
+variable "deployment_version" {
+  type      = string
+  default   = "1.0.0"
+}
