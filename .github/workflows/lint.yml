@@ -2,9 +2,13 @@ name: Lint
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+    paths:
+      - 'app/**'
   pull_request:
-    branches: [main]
+    branches: [ main ]
+    paths:
+      - 'app/**'
 
 jobs:
   lint:
