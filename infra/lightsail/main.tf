@@ -62,8 +62,7 @@ resource "aws_lightsail_container_service_deployment_version" "go_api_deploy" {
 
     # ports is a nested block, not a map
     ports {
-      port     = 80
-      protocol = "HTTP"
+      80 = "HTTP"
     }
 
     environment = {
@@ -86,8 +85,7 @@ resource "aws_lightsail_container_service_deployment_version" "go_api_deploy" {
     image          = "influxdb:2.7"
 
     ports {
-      port     = 8086
-      protocol = "HTTP"
+      8086     = "HTTP"
     }
 
     environment = {

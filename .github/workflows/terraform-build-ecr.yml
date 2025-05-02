@@ -1,14 +1,24 @@
 name: Deploy ECR Repository
 
+# on:
+#   workflow_run:
+#     workflows: ["Lint"]
+#     types:
+#       - completed
+
 on:
-  workflow_run:
-    workflows: ["Lint"]
-    types:
-      - completed
+  push:
+    branches: [ main ]
+    paths:
+      - 'infra/core/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'infra/core/**'
 
 jobs:
   deploy-ecr:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Only if lint.yml passed
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Only if lint.yml passed
 
     runs-on: ubuntu-latest
 
