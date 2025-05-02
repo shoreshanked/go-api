@@ -1,18 +1,18 @@
 variable "aws_region" {
   type    = string
-  default = "eu-west-1"  # Adjust your region here
+  default = "eu-west-1" # Adjust your region here
 }
 
 variable "influx_admin_user" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "influx_admin_pass" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "influx_url" {
@@ -22,8 +22,8 @@ variable "influx_url" {
 
 variable "influx_token" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "influx_org" {
@@ -38,36 +38,36 @@ variable "influx_bucket" {
 
 variable "octopus_api_key" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "octopus_base_uri" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "octopus_elec_mpan" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "octopus_elec_serial" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "octopus_gas_mprn" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }
 
 variable "octopus_gas_serial" {
   sensitive = true
-  type    = string
-  default = null
+  type      = string
+  default   = null
 }

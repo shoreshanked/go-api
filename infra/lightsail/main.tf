@@ -4,14 +4,14 @@ provider "aws" {
 
 # Lightsail container service creation
 resource "aws_lightsail_container_service" "go_api_service" {
-  name          = "go-api-container"
-  power         = "nano"  # Adjust power (CPU/Memory) as needed
-  scale          = 1  # Number of containers to run
+  name  = "go-api-container"
+  power = "nano" # Adjust power (CPU/Memory) as needed
+  scale = 1      # Number of containers to run
   deployment {
     containers {
-      name   = "go-api"
-      image  = "229418028078.dkr.ecr.us-west-2.amazonaws.com/go-api:latest"
-      ports  = ["80"]  # Port mapping for your Go API
+      name  = "go-api"
+      image = "229418028078.dkr.ecr.us-west-2.amazonaws.com/go-api:latest"
+      ports = ["80"] # Port mapping for your Go API
 
       environment = {
         INFLUX_URL    = var.influx_url
@@ -29,17 +29,17 @@ resource "aws_lightsail_container_service" "go_api_service" {
     }
 
     containers {
-      name   = "influxdb"
-      image  = "influxdb:latest"  # InfluxDB image
+      name  = "influxdb"
+      image = "influxdb:latest" # InfluxDB image
       environment = {
         DOCKER_INFLUXDB_INIT_MODE        = "setup"
-        DOCKER_INFLUXDB_INIT_USERNAME    = var.influx_admin_user     # e.g. "admin"
-        DOCKER_INFLUXDB_INIT_PASSWORD    = var.influx_admin_pass     # e.g. secure secret
+        DOCKER_INFLUXDB_INIT_USERNAME    = var.influx_admin_user # e.g. "admin"
+        DOCKER_INFLUXDB_INIT_PASSWORD    = var.influx_admin_pass # e.g. secure secret
         DOCKER_INFLUXDB_INIT_ORG         = var.influx_org
         DOCKER_INFLUXDB_INIT_BUCKET      = var.influx_bucket
         DOCKER_INFLUXDB_INIT_ADMIN_TOKEN = var.influx_token
       }
-      ports = ["8086"]  # Default port for InfluxDB
+      ports = ["8086"] # Default port for InfluxDB
     }
 
   }
