@@ -52,6 +52,7 @@ func sendToInfluxDB(envVars map[string]string) {
 }
 
 func main() {
+	println("Main Starting")
 	// Setup Logging
 	logService := log_controller.NewLogService("info")
 	log := logService.Logger()
