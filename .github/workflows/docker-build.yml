@@ -2,7 +2,7 @@ name: Build & Push Docker image to ECR
 
 on:
   workflow_run:
-    workflows: ["lint.yml"]
+    workflows: ["Lint"]
     types:
       - completed
 
