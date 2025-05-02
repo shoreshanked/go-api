@@ -61,7 +61,7 @@ resource "aws_lightsail_container_service_deployment_version" "go_api_deploy" {
     image          = "229418028078.dkr.ecr.us-west-2.amazonaws.com/go-api:latest"
 
     # ports is a nested block, not a map
-    ports {
+    ports = {
       80 = "HTTP"
     }
 
@@ -77,14 +77,14 @@ resource "aws_lightsail_container_service_deployment_version" "go_api_deploy" {
       INFLUX_TOKEN  = var.influx_token
       INFLUX_ORG    = var.influx_org
       INFLUX_BUCKET = var.influx_bucket
-      }
+    }
   }
 
   container {
     container_name = "influxdb"
     image          = "influxdb:2.7"
 
-    ports {
+    ports = {
       8086     = "HTTP"
     }
 
