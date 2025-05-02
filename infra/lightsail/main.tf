@@ -55,53 +55,57 @@ resource "aws_lightsail_container_service" "go_api" {
 resource "aws_lightsail_container_service_deployment_version" "go_api_deploy" {
   service_name = aws_lightsail_container_service.go_api.name
 
-  # define each container by name
-  containers = {
-    # your API container
-    "go-api" = {
-      image = "229418028078.dkr.ecr.us-west-2.amazonaws.com/go-api:latest"
-      ports = {
-        "80" = "HTTP"
-      }
-      environment = {
-        API_KEY     = var.octopus_api_key
-        BASE_URI    = var.octopus_base_uri
-        ELEC_MPAN   = var.octopus_elec_mpan
-        ELEC_SERIAL = var.octopus_elec_serial
-        GAS_MPRN    = var.octopus_gas_mprn
-        GAS_SERIAL  = var.octopus_gas_serial
+  # go‑api container
+  container {
+    container_name = "go-api"
+    image          = "229418028078.dkr.ecr.us-west-2.amazonaws.com/go-api:latest"
 
-        INFLUX_URL    = var.influx_url
-        INFLUX_TOKEN  = var.influx_token
-        INFLUX_ORG    = var.influx_org
-        INFLUX_BUCKET = var.influx_bucket
-      }
+    # ports is a nested block, not a map
+    ports {
+      port     = 80
+      protocol = "HTTP"
     }
 
-    # your InfluxDB container
-    "influxdb" = {
-      image = "influxdb:2.7"
-      ports = {
-        "8086" = "HTTP"
+    environment = {
+      API_KEY     = var.octopus_api_key
+      BASE_URI    = var.octopus_base_uri
+      ELEC_MPAN   = var.octopus_elec_mpan
+      ELEC_SERIAL = var.octopus_elec_serial
+      GAS_MPRN    = var.octopus_gas_mprn
+      GAS_SERIAL  = var.octopus_gas_serial
+
+      INFLUX_URL    = var.influx_url
+      INFLUX_TOKEN  = var.influx_token
+      INFLUX_ORG    = var.influx_org
+      INFLUX_BUCKET = var.influx_bucket
       }
-      environment = {
-        DOCKER_INFLUXDB_INIT_MODE        = "setup"
-        DOCKER_INFLUXDB_INIT_USERNAME    = var.influx_admin_user
-        DOCKER_INFLUXDB_INIT_PASSWORD    = var.influx_admin_pass
-        DOCKER_INFLUXDB_INIT_ORG         = var.influx_org
-        DOCKER_INFLUXDB_INIT_BUCKET      = var.influx_bucket
-        DOCKER_INFLUXDB_INIT_ADMIN_TOKEN = var.influx_token
-      }
+  }
+
+  container {
+    container_name = "influxdb"
+    image          = "influxdb:2.7"
+
+    ports {
+      port     = 8086
+      protocol = "HTTP"
+    }
+
+    environment = {
+      DOCKER_INFLUXDB_INIT_MODE        = "setup"
+      DOCKER_INFLUXDB_INIT_USERNAME    = var.influx_admin_user
+      DOCKER_INFLUXDB_INIT_PASSWORD    = var.influx_admin_pass
+      DOCKER_INFLUXDB_INIT_ORG         = var.influx_org
+      DOCKER_INFLUXDB_INIT_BUCKET      = var.influx_bucket
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN = var.influx_token
     }
   }
 
-  # Which container+port serves public traffic, plus its health check
   public_endpoint {
     container_name = "go-api"
     container_port = 80
 
     health_check {
-      path                = "/health"
+      path                = "/"
       success_codes       = "200-399"
       interval_seconds    = 5
       timeout_seconds     = 2
@@ -109,4 +113,5 @@ resource "aws_lightsail_container_service_deployment_version" "go_api_deploy" {
       unhealthy_threshold = 2
     }
   }
+
 }
