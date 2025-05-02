@@ -49,6 +49,33 @@ resource "aws_lightsail_container_service" "go_api" {
   name  = "go-api-service"
   power = "nano"
   scale = 1
+
+  private_registry_access {
+    ecr_image_puller_role {
+      is_active = true
+    }
+  }
+}
+
+data "aws_iam_policy_document" "go_api_policy_document" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_lightsail_container_service.go_api.private_registry_access[0].ecr_image_puller_role[0].principal_arn]
+    }
+
+    actions = [
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+    ]
+  }
+}
+
+resource "aws_ecr_repository_policy" "go_api_policy" {
+  repository = "go-api"
+  policy     = data.aws_iam_policy_document.go_api_policy_document.json
 }
 
 # 2) Deploy the containers & public endpoint
