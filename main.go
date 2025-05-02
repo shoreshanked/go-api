@@ -94,6 +94,6 @@ func main() {
 			Msg("Consumption data logged")
 	}
 
-	// Call the sendToInfluxDB function
+	// Call the sendToInfluxDB functions
 	sendToInfluxDB(coreService.EnvironmentVariables())
 }
