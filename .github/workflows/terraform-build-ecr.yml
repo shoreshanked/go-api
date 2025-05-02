@@ -2,6 +2,7 @@ name: Deploy ECR Repository
 
 on:
   workflow_run:
+    paths: infra/**
     workflows: ["Lint"]
     types:
       - completed
@@ -17,9 +18,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.6.6  # You can pin any version you prefer
+      uses: hashicorp/setup-terraform@v3
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
